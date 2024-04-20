@@ -16,7 +16,7 @@
         devShell = with pkgs; mkShell {
 	  nativeBuildInputs = [ pkg-config ];
           buildInputs = [ cargo rustc rustfmt rust-analyzer rustup pre-commit rustPackages.clippy # Rust
-			gobject-introspection-unwrapped glib gdk-pixbuf gtk4 pango libxml2 librsvg # GTK
+			gobject-introspection-unwrapped glib gdk-pixbuf gtk4 pango libxml2 librsvg libadwaita # GTK
 			bacon neovim neovide ]; # Me
           RUST_SRC_PATH = rustPlatform.rustLibSrc;
         };

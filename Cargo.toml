@@ -10,6 +10,11 @@ package = "gtk4"
 version = "0.8" # Tested with 0.8.1, but should be fine
 features = ["v4_12"]
 
+[dependencies.adw]
+package = "libadwaita"
+version = "0.6"
+features = ["v1_5"]
+
 [dependencies]
 rand = "0.8"
 rand_derive2 = "0.1"
