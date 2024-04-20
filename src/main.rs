@@ -100,7 +100,7 @@ fn build_ui(application: &Application) {
 
 fn load_css() {
     let provider = gtk::CssProvider::new();
-    provider.load_from_string(include_str!("style.css"));
+    provider.load_from_path("src/style.css");
 
     // Add the provider to the default screen
     gtk::style_context_add_provider_for_display(
@@ -117,13 +117,11 @@ fn refresh_stratagem(/*avail_stratagems: &mut Vec<db::Stratagem>,*/
                      picture: &gtk::Picture,
                      arrows: &gtk::Label,
                      ) {
-    /*use rand::thread_rng;
-    use rand::seq::SliceRandom;
-    avail_stratagems.shuffle(&mut thread_rng());
+    current_stratagem.set(rand::random());
+    let stratagem_scaled = gtk::gdk_pixbuf::Pixbuf::from_file_at_scale(
+        current_stratagem.get().get_image_path(), 3840, 2160, true).unwrap();
 
-    let current_stratagem = &avail_stratagems[0]; */
-    current_stratagem.set(rand::random()); 
-    picture.set_filename(Some(current_stratagem.get().get_image_path()));
+    picture.set_paintable(Some(&gtk::gdk::Texture::for_pixbuf(&stratagem_scaled)));
     
     let printable = current_stratagem.get().to_string();
     label.set_text(format!("Enter Keycode for {printable}").as_str());
@@ -156,8 +154,6 @@ fn keybinds_magic(key: gtk::gdk::Key,
             },
         _ => (),
     }
-    dbg!(&input_buffer.lock().unwrap().to_vec());
-    dbg!(&current_stratagem.get().get_keycode());
     if input_buffer.lock().unwrap().to_vec() == current_stratagem.get().get_keycode() {
         refresh_stratagem(current_stratagem, label, picture, arrows);
         input_buffer.lock().unwrap().clear();

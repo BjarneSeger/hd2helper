@@ -195,7 +195,7 @@ impl Stratagem {
             M105Stalwart => "PatrioticAdministrationCenter/Stalwart.svg",
             MG43MachineGun => "PatrioticAdministrationCenter/Machine Gun.svg",
             ARC3ArcThrower => "EngineeringBay/Arc Thrower.svg",
-            GL21GrenadeLauncher => "EngineeringBay/Grenade Launcher",
+            GL21GrenadeLauncher => "EngineeringBay/Grenade Launcher.svg",
             APW1AntiMaterielRifle => "PatrioticAdministrationCenter/Anti-Materiel Rifle.svg",
             RS422Railgun => "PatrioticAdministrationCenter/Railgun.svg",
             GR8RecoillessRifle => "PatrioticAdministrationCenter/Recoilless Rifle.svg",
@@ -203,7 +203,7 @@ impl Stratagem {
             LAS99QuasarCannon => "EngineeringBay/Quasar Cannon.svg",
             MG206HeavyMachineGun => "PatrioticAdministrationCenter/Heavy Machine Gun.svg",
 
-            EXO45PatriotExosuit => "RoboticsWorkshop/Patriotic Exosuit.svg",
+            EXO45PatriotExosuit => "RoboticsWorkshop/Patriot Exosuit.svg",
 
             ARC3TeslaTower => "Bridge/Tesla Tower.svg",
             M12MortarSentry => "RoboticsWorkshop/Mortar Sentry.svg",
@@ -232,7 +232,7 @@ impl Stratagem {
             EagleStrafingRun => "Hangar/Eagle Strafing Run.svg",
             EagleAirstrike => "Hangar/Eagle Airstrike.svg",
             EagleClusterBomb => "Hangar/Eagle Cluster Bomb.svg",
-            EagleNapalmStrike => "Hangar/Eagle Napalm Strike.svg",
+            EagleNapalmStrike => "Hangar/Eagle Napalm Airstrike.svg",
             EagleSmokeStrike => "Hangar/Eagle Smoke Strike.svg",
             Eagle110MMRocketPods => "Hangar/Eagle 110MM Rocket Pods.svg",
             Eagle500kgBomb => "Hangar/Eagle 500KG Bomb.svg",
