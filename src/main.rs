@@ -11,13 +11,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>.
 
-use gtk::prelude::*;
-use gtk::{glib, Application, ApplicationWindow};
-use std::sync::{Arc, Mutex};
+use adw::prelude::*;
+use gtk::{glib, Application};
 use std::rc::Rc;
 use std::cell::Cell;
+use std::cell::RefCell;
 
 mod db;
+mod gui_templates;
+use gui_templates::AvailablePages::*;
 
 fn main() -> glib::ExitCode {
     let application = Application::builder()
@@ -27,29 +29,7 @@ fn main() -> glib::ExitCode {
     application.connect_startup(|_| load_css());
 
     application.connect_activate(|app| {
-        let window = ApplicationWindow::builder()
-            .application(app)
-            .title("Helldivers 2 Helper")
-            .default_width(350)
-            .default_height(70)
-            .build();
-
-        let grid = gtk::Grid::builder()
-        .margin_start(6)
-        .margin_end(6)
-        .margin_top(6)
-        .margin_bottom(6)
-        .halign(gtk::Align::Center)
-        .valign(gtk::Align::Center)
-        .row_spacing(6)
-        .column_spacing(6)
-        .build();
-
-        let refresh_button = gtk::Button::from_icon_name("view-refresh");
-        let menubar = gtk::HeaderBar::new();
-        menubar.pack_end(&refresh_button);
-        window.set_titlebar(Some(&menubar));
-
+        // #TODO:
         // Allow users to select only specific Stratagems
         let mut avail_stratagems: &mut Vec<db::Stratagem> = &mut Vec::new();
         for _ in 0..10 {
@@ -59,12 +39,10 @@ fn main() -> glib::ExitCode {
         let global_stratagem = 
             Rc::new(Cell::new(rand::random::<db::Stratagem>()));
 
-        let current_stratagem = avail_stratagems[0];        
-
+        let current_stratagem = global_stratagem.get();
         let prompt = gtk::Label::new(Some(
             format!("Enter Keycode for {current_stratagem}").as_str())
         );
-        grid.attach(&prompt, 0,0,1,1);
 
         // Graphical representation of the stratagem...
         let stratagem_scaled = gtk::gdk_pixbuf::Pixbuf::from_file_at_scale(
@@ -72,22 +50,55 @@ fn main() -> glib::ExitCode {
         let stratagem_image = gtk::Picture::for_paintable(&gtk::gdk::Texture::for_pixbuf(&stratagem_scaled));
         stratagem_image.set_can_shrink(true);
         let keycode = global_stratagem.get().get_keycode();
-        grid.attach(&stratagem_image, 0,2,1,1); 
+        // grid.attach(&stratagem_image, 0,2,1,1); 
 
         // ... and the keycode
         let keycode_visual = gtk::Label::new(Some(get_keycode_str(&keycode).as_str()));
         keycode_visual.add_css_class("arrows");
-        grid.attach(&keycode_visual, 0, 1, 1, 1);
+        // grid.attach(&keycode_visual, 0, 1, 1, 1);
+        let right_page = gui_templates::create_main_page(KeycodeTrainer{
+            stratagem_picture: &stratagem_image,
+            prompt: &prompt,
+            keycode: &keycode_visual,
+        });
 
+        let overview = gtk::ListBox::builder()
+            .css_classes(*&["navigation-sidebar"])
+            .build();
+        overview.append(&gtk::ListBoxRow::builder()
+                        .child(&gtk::Label::new(Some("Keycode Trainer")))
+                        .build());
+        overview.append(&gtk::ListBoxRow::builder()
+                        .child(&gtk::Label::new(Some("Coming soon...")))
+                        .build());
+
+        let sidebar = gui_templates::create_sidebar(
+            &gui_templates::create_adw_toolbar(&gtk::Label::new(Some("Helldivers 2 Helper"))),
+            &overview
+            );
+
+        let main_content = adw::NavigationSplitView::builder()
+            .content(&right_page)
+            .sidebar(&sidebar)
+            .build();
+
+        let window = adw::ApplicationWindow::builder()
+            .application(app)
+            .title("Helldivers 2 Helper")
+            .content(&main_content)
+            .css_classes(*&["background", "csd"])
+            .default_width(550)
+            .default_height(550)
+            .build();
+        
         // Shortcuts for training Stratagem codes
-        let input_buffer = Arc::new(Mutex::new(Vec::new()));
+        let input_buffer = Rc::new(RefCell::new(global_stratagem.get().get_keycode()));
         let event_controller = gtk::EventControllerKey::new();
         event_controller.connect_key_pressed( move |_, key, _, _| {
            keybinds_magic(key, input_buffer.clone(), &prompt, &stratagem_image, &keycode_visual, global_stratagem.clone())
         });
 
         window.add_controller(event_controller);
-        window.set_child(Some(&grid));
         window.present();
     });
 
@@ -98,6 +109,7 @@ fn build_ui(application: &Application) {
 
 }
 
+// Get CSS for some visual things
 fn load_css() {
     let provider = gtk::CssProvider::new();
     provider.load_from_path("src/style.css");
@@ -110,9 +122,10 @@ fn load_css() {
     );
 }
 
-/// This is what happens when a guess was made 
-fn refresh_stratagem(/*avail_stratagems: &mut Vec<db::Stratagem>,*/
-                     current_stratagem: Rc<Cell<db::Stratagem>>,
+/// This refreshes the Label, picture, Arrows and Stratagem when the UI needs
+/// to be refreshed
+fn refresh_stratagem(current_stratagem: Rc<Cell<db::Stratagem>>,
+                     current_input: Rc<RefCell<Vec<db::Code>>>,
                      label: &gtk::Label,
                      picture: &gtk::Picture,
                      arrows: &gtk::Label,
@@ -120,6 +133,8 @@ fn refresh_stratagem(/*avail_stratagems: &mut Vec<db::Stratagem>,*/
     current_stratagem.set(rand::random());
     let stratagem_scaled = gtk::gdk_pixbuf::Pixbuf::from_file_at_scale(
         current_stratagem.get().get_image_path(), 3840, 2160, true).unwrap();
+
+    current_input.replace(current_stratagem.get().get_keycode());
 
     picture.set_paintable(Some(&gtk::gdk::Texture::for_pixbuf(&stratagem_scaled)));
     
@@ -133,7 +148,7 @@ fn refresh_stratagem(/*avail_stratagems: &mut Vec<db::Stratagem>,*/
 /// This function checks the combination and modifies the input buffer as well as
 /// the ui if it needs to be cleared
 fn keybinds_magic(key: gtk::gdk::Key,
-                  input_buffer: Arc<Mutex<Vec<db::Code>>>,
+                  input_buffer: Rc<RefCell<Vec<db::Code>>>,
                   label: &gtk::Label,
                   picture: &gtk::Picture,
                   arrows: &gtk::Label,
@@ -141,22 +156,16 @@ fn keybinds_magic(key: gtk::gdk::Key,
                   ) -> glib::Propagation{
     use gtk::gdk::Key;
     use db::Code;
-    match key {
-        Key::w => input_buffer.lock().unwrap().push(Code::Up),
-        Key::a => input_buffer.lock().unwrap().push(Code::Left),
-        Key::s => input_buffer.lock().unwrap().push(Code::Down),
-        Key::d => input_buffer.lock().unwrap().push(Code::Right),
-        // Would like to make this a seperate function, but the passing
-        // around of things would be anything but nice
-        Key::F5 => {
-            refresh_stratagem(current_stratagem.clone(), label, picture, arrows);
-            input_buffer.lock().unwrap().clear();
-            },
-        _ => (),
-    }
-    if input_buffer.lock().unwrap().to_vec() == current_stratagem.get().get_keycode() {
-        refresh_stratagem(current_stratagem, label, picture, arrows);
-        input_buffer.lock().unwrap().clear();
+    let refresh = match key {
+        Key::w => check_refresh(Code::Up, input_buffer.clone()),
+        Key::a => check_refresh(Code::Left, input_buffer.clone()),
+        Key::s => check_refresh(Code::Down, input_buffer.clone()),
+        Key::d => check_refresh(Code::Right, input_buffer.clone()),
+        Key::F5 => true,
+        _ => false,
+    };
+    if refresh == true {
+        refresh_stratagem(current_stratagem, input_buffer.clone(), label, picture, arrows);
     }
     glib::Propagation::Proceed
 }
@@ -168,4 +177,18 @@ fn get_keycode_str(keycode_vec: &Vec<db::Code>) -> String {
         string = string + keycode_vec[i].get_arrow();
     }
     string
+}
+
+fn check_refresh(current_input: db::Code,
+                 keycode: Rc<RefCell<Vec<db::Code>>>) -> bool {
+    if keycode.borrow().len() == 0 {
+        println!("keycode buffer was empty!");
+        return true;
+    }
+    if keycode.borrow_mut().remove(0) == current_input {
+        if keycode.borrow().len() != 0 {
+            return false;
+        }
+    }
+    true
 }

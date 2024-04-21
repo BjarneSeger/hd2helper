@@ -1,5 +1,27 @@
-grid * {
-	font-size: 30px;
+.adwaita-sidebar-title {
+	font-weight: bold;
+	background-color: rgb(42, 42, 42);
+}
+
+.sidebar-pane {
+	background-color: rgb(42, 42, 42);
+}
+
+.keycode-title {
+	font-size: 26px;
+	font-weight: 800;
+}
+
+.background {
+	background-color: rgb(36, 36, 36);
+}
+
+.navigation-sidebar {
+	border-bottom-left-radius: 6px;
+	border-bottom-right-radius: 6px;
+	border-top-left-radius: 6px;
+	border-top-right-radius: 6px;
+	background-color: rgb(42, 42, 42);
 }
 
 .arrows {
