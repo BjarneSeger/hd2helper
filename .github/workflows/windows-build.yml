@@ -13,6 +13,8 @@ jobs:
         with:
           msystem: UCRT64
           update: true
-          install: git mingw-w64-ucrt-x86_64-gcc mingw-w64-cargo-c mingw-w64-rust mingw-w64-glib2 mingw-w64-gdk-pixbuf2 mingw-w64-gtk4 mingw-w64-pango mingw-w64-libxml2 mingw-w64-librsvg mingw-w64-libadwaita
+          install: | 
+            git mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-cargo-c mingw-w64-ucrt-x86_64-rust 
+            mingw-w64-ucrt-x86_64-glib2 mingw-w64-ucrt-x86_64-gdk-pixbuf2 mingw-w64-ucrt-x86_64-gtk4 mingw-w64-ucrt-x86_64-pango mingw-w64-ucrt-x86_64-libxml2 mingw-w64-ucrt-x86_64-librsvg mingw-w64-ucrt-x86_64-libadwaita
       - name: CI-Build
         run: cargo build --release
