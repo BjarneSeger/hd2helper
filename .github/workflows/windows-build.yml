@@ -22,4 +22,4 @@ jobs:
           cargo build --release
       - uses: actions/upload-artifact@v4
         with:
-          path: D:\a\hd2helper\target\release\hd2helper.exe
+          path: D:\a\hd2helper\hd2helper\target\release\hd2helper.exe
