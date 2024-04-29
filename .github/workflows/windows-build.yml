@@ -19,7 +19,7 @@ jobs:
       - name: CI-Build
         run: |
           export RUSTFLAGS="-C target-feature=+crt-static"
-          cargo build --release --target=x86_64-pc-windows-gnu
+          cargo build --release --target=x86_64-pc-windows-msvc
       - uses: actions/upload-artifact@v4
         with:
           path: D:\a\hd2helper\hd2helper\target\release\hd2helper.exe
