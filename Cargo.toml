@@ -5,9 +5,6 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[target.x86_64-pc-windows-gnu]
-rustflags = ["-C", "target-features=+crt-static"]
-
 [dependencies.gtk]
 package = "gtk4"
 version = "0.8" # Tested with 0.8.1, but should be fine
