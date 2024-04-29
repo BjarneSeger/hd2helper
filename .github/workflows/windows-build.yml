@@ -18,9 +18,7 @@ jobs:
             mingw-w64-ucrt-x86_64-glib2 mingw-w64-ucrt-x86_64-gdk-pixbuf2 mingw-w64-ucrt-x86_64-gtk4 mingw-w64-ucrt-x86_64-pango mingw-w64-ucrt-x86_64-libxml2 mingw-w64-ucrt-x86_64-librsvg mingw-w64-ucrt-x86_64-libadwaita
       - name: CI-Build
         run: |
-          rustc --print cfg
-          # export RUSTFLAGS="-C target-feature=+crt-static"
-          # cargo build --release
+          cargo build --release --target=x86_64-pc-windows-gnu
       - uses: actions/upload-artifact@v4
         with:
           path: D:\a\hd2helper\hd2helper\target\release\hd2helper.exe
